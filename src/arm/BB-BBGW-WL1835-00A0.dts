@@ -82,21 +82,21 @@
 				>;
 			};
 
-			uart3_pins_default: pinmux_uart3_pins_default {
+			uart5_pins_default: pinmux_uart5_pins_default {
 				pinctrl-single,pins = <
-					AM33XX_IOPAD(0x934, PIN_INPUT_PULLUP | MUX_MODE1)	/* gmii1_rxd3.uart3_rxd */
-					AM33XX_IOPAD(0x938, PIN_OUTPUT_PULLDOWN | MUX_MODE1)	/* gmii1_rxd2.uart3_txd */
-					AM33XX_IOPAD(0x948, PIN_INPUT | MUX_MODE3)		/* mdio_data.uart3_ctsn */
-					AM33XX_IOPAD(0x94c, PIN_OUTPUT_PULLDOWN | MUX_MODE3)	/* mdio_clk.uart3_rtsn */
+					AM33XX_IOPAD(0x908, PIN_INPUT_PULLUP | MUX_MODE3)	/* (H16) gmii1_col.uart5_rxd */
+					AM33XX_IOPAD(0x944, PIN_OUTPUT_PULLDOWN | MUX_MODE3)	/* (H18) gmii1_reclk.uart5_txd */
+					AM33XX_IOPAD(0x90C, PIN_INPUT | MUX_MODE5)		/* (H17) gmii1_crs.uart5_ctsn */
+					AM33XX_IOPAD(0x910, PIN_OUTPUT_PULLDOWN | MUX_MODE5)	/* (J15) gmii1_rxerr.uart5_rtsn */
 				>;
 			};
 
-			uart3_pins_sleep: pinmux_uart3_pins_sleep {
+			uart5_pins_sleep: pinmux_uart5_pins_sleep {
 				pinctrl-single,pins = <
-					AM33XX_IOPAD(0x934, PIN_INPUT_PULLDOWN | MUX_MODE7)	/* (L17) gmii1_rxd3.uart3_rxd */
-					AM33XX_IOPAD(0x938, PIN_INPUT_PULLDOWN | MUX_MODE7)	/* (L16) gmii1_rxd2.uart3_txd */
-					AM33XX_IOPAD(0x948, PIN_INPUT_PULLDOWN | MUX_MODE7)	/* (M17) mdio_data.uart3_ctsn */
-					AM33XX_IOPAD(0x94c, PIN_INPUT_PULLDOWN | MUX_MODE7)	/* (M18) mdio_clk.uart3_rtsn */
+					AM33XX_IOPAD(0x908, PIN_INPUT_PULLDOWN | MUX_MODE7)	/* (H16) gmii1_col.uart5_rxd */
+					AM33XX_IOPAD(0x944, PIN_INPUT_PULLDOWN | MUX_MODE7)	/* (H18) gmii1_reclk.uart5_txd */
+					AM33XX_IOPAD(0x90C, PIN_INPUT_PULLDOWN | MUX_MODE7)	/* (H17) gmii1_crs.uart5_ctsn */
+					AM33XX_IOPAD(0x910, PIN_INPUT_PULLDOWN | MUX_MODE7)	/* (J15) gmii1_rxerr.uart5_rtsn */
 				>;
 			};
 		};
@@ -170,11 +170,11 @@
 	};
 
 	fragment@5 {
-		target = <&uart3>;
+		target = <&uart5>;
 		__overlay__ {
 			pinctrl-names = "default", "sleep";
-			pinctrl-0 = <&uart3_pins_default>;
-			pinctrl-1 = <&uart3_pins_sleep>;
+			pinctrl-0 = <&uart5_pins_default>;
+			pinctrl-1 = <&uart5_pins_sleep>;
 			status = "okay";
 		};
 	};
