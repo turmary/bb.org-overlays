@@ -134,13 +134,6 @@
 		};
 	};
 
-	fragment@3 {
-		target = <&mac>;
-		__overlay__ {
-			status = "disabled";
-		};
-	};
-
 	fragment@4 {
 		target = <&mmc3>;
 		__overlay__ {
