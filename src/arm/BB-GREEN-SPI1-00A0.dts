@@ -1,0 +1,352 @@
+/*
+ * Copyright (C) 2017 Seeed Development Limited - http://www.seeedstudio.com/
+ * Peter Yang <turmary@126.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * BBGW or BBG Lora Gateway use SPI1 to connect to Lora module.
+ * It's must be cared the usage of BT_AUD_OUT pin from WL1835.
+ * 
+ */
+/* BT_AUD_OUT from wl1835 has to be pulled low when WL_EN is activated.*/
+/* in case it isn't, wilink8 ends up in one of the test modes that     */
+/* intruces various issues (elp wkaeup timeouts etc.)                  */
+/* On the BBGW this pin is routed through the level shifter (U21) that */
+/* introduces a pullup on the line and wilink8 ends up in a bad state. */
+/* use a gpio hog to force this pin low. An alternative may be adding  */
+/* an external pulldown on U21 pin 4.                                  */
+
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/pinctrl/am33xx.h>
+#include <dt-bindings/interrupt-controller/irq.h>
+
+/ {
+	compatible = "ti,beaglebone", "ti,beaglebone-black", "ti,beaglebone-green";
+
+	/* identification */
+	part-number = "BB-GREEN-SPIDEV1";
+	version = "00A0";
+
+	/* state the resources this cape uses */
+	exclusive-use =
+		/* the pin header uses */
+		// "P9.28",	/* spi1_cs0 */
+		"P9.29",	/* spi1_d0 */
+		"P9.30",	/* spi1_d1 */
+		"P9.31",	/* spi1_sclk */
+		"P9.42",	/* spi1_cs1 */
+		"P9.42.1",
+		/* the hardware ip uses */
+		"spi1";
+
+	/*
+	 * Free up the pins used by the cape from the pinmux helpers.
+	 */
+	fragment@0 {
+		target = <&ocp>;
+		__overlay__ {
+			//Audio...
+			P9_29_pinmux { status = "disabled"; };
+			P9_30_pinmux { status = "disabled"; };
+			P9_31_pinmux { status = "disabled"; };
+			P9_42_pinmux { status = "disabled"; };
+			P9_92_pinmux { status = "disabled"; };
+		};
+	};
+
+	fragment@1 {
+		target = <&am33xx_pinmux>;
+			__overlay__ {
+			/************************/
+			/* P9 Header */
+			/************************/
+
+			/* P9_29 (ZCZ ball B13) audio */
+			P9_29_default_pin: pinmux_P9_29_default_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0994, PIN_INPUT_PULLDOWN | INPUT_EN | MUX_MODE7) >; };	/* mcasp0_fsx.gpio3_15 */
+			P9_29_gpio_pin: pinmux_P9_29_gpio_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0994, PIN_OUTPUT | INPUT_EN | MUX_MODE7) >; };		/* mcasp0_fsx.gpio3_15 */
+			P9_29_gpio_pu_pin: pinmux_P9_29_gpio_pu_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0994, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE7) >; };	/* mcasp0_fsx.gpio3_15 */
+			P9_29_gpio_pd_pin: pinmux_P9_29_gpio_pd_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0994, PIN_OUTPUT_PULLDOWN | INPUT_EN | MUX_MODE7) >; };	/* mcasp0_fsx.gpio3_15 */
+			P9_29_gpio_input_pin: pinmux_P9_29_gpio_input_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0994, PIN_INPUT | MUX_MODE7) >; };			/* mcasp0_fsx.gpio3_15 */
+			P9_29_pwm_pin: pinmux_P9_29_pwm_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0994, PIN_OUTPUT_PULLDOWN | INPUT_EN | MUX_MODE1) >; };	/* mcasp0_fsx.ehrpwm0b */
+			P9_29_spi_pin: pinmux_P9_29_spi_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0994, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE3) >; };	/* mcasp0_fsx.spi1_d0 */
+			P9_29_pruout_pin: pinmux_P9_29_pruout_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0994, PIN_OUTPUT_PULLDOWN | INPUT_EN | MUX_MODE5) >; };	/* mcasp0_fsx.pru0_out1 */
+			P9_29_pruin_pin: pinmux_P9_29_pruin_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0994, PIN_INPUT | MUX_MODE6) >; };			/* mcasp0_fsx.pru0_in1 */
+
+			/* P9_30 (ZCZ ball D12) gpio3_16 */
+			P9_30_default_pin: pinmux_P9_30_default_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0998, PIN_INPUT_PULLDOWN | INPUT_EN | MUX_MODE7) >; };	/* mcasp0_axr0.gpio3_16 */
+			P9_30_gpio_pin: pinmux_P9_30_gpio_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0998, PIN_OUTPUT | INPUT_EN | MUX_MODE7) >; };		/* mcasp0_axr0.gpio3_16 */
+			P9_30_gpio_pu_pin: pinmux_P9_30_gpio_pu_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0998, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE7) >; };	/* mcasp0_axr0.gpio3_16 */
+			P9_30_gpio_pd_pin: pinmux_P9_30_gpio_pd_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0998, PIN_OUTPUT_PULLDOWN | INPUT_EN | MUX_MODE7) >; };	/* mcasp0_axr0.gpio3_16 */
+			P9_30_gpio_input_pin: pinmux_P9_30_gpio_input_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0998, PIN_INPUT | MUX_MODE7) >; };			/* mcasp0_axr0.gpio3_16 */
+			P9_30_pwm_pin: pinmux_P9_30_pwm_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0998, PIN_OUTPUT_PULLDOWN | INPUT_EN | MUX_MODE1) >; };	/* mcasp0_axr0.ehrpwm0_tripzone_input */
+			P9_30_spi_pin: pinmux_P9_30_spi_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0998, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE3) >; };	/* mcasp0_axr0.spi1_d1 */
+			P9_30_pruout_pin: pinmux_P9_30_pruout_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0998, PIN_OUTPUT_PULLDOWN | INPUT_EN | MUX_MODE5) >; };	/* mcasp0_axr0.pru0_out2 */
+			P9_30_pruin_pin: pinmux_P9_30_pruin_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0998, PIN_INPUT | MUX_MODE6) >; };			/* mcasp0_axr0.pru0_in2 */
+
+			/* P9_31 (ZCZ ball A13) audio */
+			P9_31_default_pin: pinmux_P9_31_default_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0990, PIN_INPUT_PULLDOWN | INPUT_EN | MUX_MODE7) >; };	/* mcasp0_aclkx.gpio3_14 */
+			P9_31_gpio_pin: pinmux_P9_31_gpio_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0990, PIN_OUTPUT | INPUT_EN | MUX_MODE7) >; };		/* mcasp0_aclkx.gpio3_14 */
+			P9_31_gpio_pu_pin: pinmux_P9_31_gpio_pu_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0990, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE7) >; };	/* mcasp0_aclkx.gpio3_14 */
+			P9_31_gpio_pd_pin: pinmux_P9_31_gpio_pd_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0990, PIN_OUTPUT_PULLDOWN | INPUT_EN | MUX_MODE7) >; };	/* mcasp0_aclkx.gpio3_14 */
+			P9_31_gpio_input_pin: pinmux_P9_31_gpio_input_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0990, PIN_INPUT | MUX_MODE7) >; };			/* mcasp0_aclkx.gpio3_14 */
+			P9_31_pwm_pin: pinmux_P9_31_pwm_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0990, PIN_OUTPUT_PULLDOWN | INPUT_EN | MUX_MODE1) >; };	/* mcasp0_aclkx.ehrpwm0a */
+			P9_31_spi_sclk_pin: pinmux_P9_31_spi_sclk_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0990, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE3) >; };	/* mcasp0_aclkx.spi1_sclk */
+			P9_31_pruout_pin: pinmux_P9_31_pruout_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0990, PIN_OUTPUT_PULLDOWN | INPUT_EN | MUX_MODE5) >; };	/* mcasp0_aclkx.pru0_out0 */
+			P9_31_pruin_pin: pinmux_P9_31_pruin_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0990, PIN_INPUT | MUX_MODE6) >; };			/* mcasp0_aclkx.pru0_in0 */
+
+			/* P9_42 (ZCZ ball C18) gpio0_7 */
+			P9_42_default_pin: pinmux_P9_42_default_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0964, PIN_INPUT_PULLDOWN | INPUT_EN | MUX_MODE7) >; };	/* eCAP0_in_PWM0_out.gpio0_7 */
+			P9_42_gpio_pin: pinmux_P9_42_gpio_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0964, PIN_OUTPUT | INPUT_EN | MUX_MODE7) >; };		/* eCAP0_in_PWM0_out.gpio0_7 */
+			P9_42_gpio_pu_pin: pinmux_P9_42_gpio_pu_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0964, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE7) >; };	/* eCAP0_in_PWM0_out.gpio0_7 */
+			P9_42_gpio_pd_pin: pinmux_P9_42_gpio_pd_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0964, PIN_OUTPUT_PULLDOWN | INPUT_EN | MUX_MODE7) >; };	/* eCAP0_in_PWM0_out.gpio0_7 */
+			P9_42_gpio_input_pin: pinmux_P9_42_gpio_input_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0964, PIN_INPUT | MUX_MODE7) >; };			/* eCAP0_in_PWM0_out.gpio0_7 */
+			P9_42_pwm_pin: pinmux_P9_42_pwm_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0964, PIN_OUTPUT_PULLDOWN | INPUT_EN | MUX_MODE0) >; };	/* eCAP0_in_PWM0_out.ecap0_in_pwm0_out */
+			P9_42_uart_pin: pinmux_P9_42_uart_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0964, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE1) >; };	/* eCAP0_in_PWM0_out.uart3_txd */
+			P9_42_spi_cs_pin: pinmux_P9_42_spi_cs_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0964, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE2) >; };	/* eCAP0_in_PWM0_out.spi1_cs1 */
+			P9_42_pru_ecap_pin: pinmux_P9_42_pru_ecap_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0964, PIN_OUTPUT_PULLDOWN | INPUT_EN | MUX_MODE3) >; };	/* eCAP0_in_PWM0_out.pr1_ecap0_ecap_capin_apwm_o */
+			P9_42_spi_sclk_pin: pinmux_P9_42_spi_sclk_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0964, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE4) >; };	/* eCAP0_in_PWM0_out.spi1_sclk */
+
+			/* P9_42.1 */
+			/* P9_92 (ZCZ ball B12) gpio3_18 */
+			P9_92_default_pin: pinmux_P9_92_default_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x09a0, PIN_INPUT_PULLDOWN | INPUT_EN | MUX_MODE7) >; };	/* mcasp0_aclkr.gpio3_18 */
+			P9_92_gpio_pin: pinmux_P9_92_gpio_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x09a0, PIN_OUTPUT | INPUT_EN | MUX_MODE7) >; };		/* mcasp0_aclkr.gpio3_18 */
+			P9_92_gpio_pu_pin: pinmux_P9_92_gpio_pu_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x09a0, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE7) >; };	/* mcasp0_aclkr.gpio3_18 */
+			P9_92_gpio_pd_pin: pinmux_P9_92_gpio_pd_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x09a0, PIN_OUTPUT_PULLDOWN | INPUT_EN | MUX_MODE7) >; };	/* mcasp0_aclkr.gpio3_18 */
+			P9_92_gpio_input_pin: pinmux_P9_92_gpio_input_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x09a0, PIN_INPUT | MUX_MODE7) >; };			/* mcasp0_aclkr.gpio3_18 */
+			P9_92_qep_pin: pinmux_P9_92_qep_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x09a0, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE1) >; };	/* mcasp0_aclkr.eqep0a_in */
+			P9_92_pruout_pin: pinmux_P9_92_pruout_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x09a0, PIN_OUTPUT_PULLDOWN | INPUT_EN | MUX_MODE5) >; };	/* mcasp0_aclkr.pru0_out4 */
+			P9_92_pruin_pin: pinmux_P9_92_pruin_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x09a0, PIN_INPUT | MUX_MODE6) >; };			/* mcasp0_aclkr.pru0_in4 */
+		};
+	};
+
+	/************************/
+	/* Pin Multiplexing */
+	/************************/
+	fragment@2 {
+		target = <&ocp>;
+		__overlay__ {
+			/************************/
+			/* P9 Header */
+			/************************/
+
+			/* P9_29 (ZCZ ball B13) audio */
+			P9_29_pinmux {
+				compatible = "bone-pinmux-helper";
+				status = "okay";
+				pinctrl-names = "default", "gpio", "gpio_pu", "gpio_pd", "gpio_input", "spi", "pwm", "pruout", "pruin";
+				pinctrl-0 = <&P9_29_default_pin>;
+				pinctrl-1 = <&P9_29_gpio_pin>;
+				pinctrl-2 = <&P9_29_gpio_pu_pin>;
+				pinctrl-3 = <&P9_29_gpio_pd_pin>;
+				pinctrl-4 = <&P9_29_gpio_input_pin>;
+				pinctrl-5 = <&P9_29_spi_pin>;
+				pinctrl-6 = <&P9_29_pwm_pin>;
+				pinctrl-7 = <&P9_29_pruout_pin>;
+				pinctrl-8 = <&P9_29_pruin_pin>;
+			};
+
+			/* P9_30 (ZCZ ball D12) */
+			P9_30_pinmux {
+				compatible = "bone-pinmux-helper";
+				status = "okay";
+				pinctrl-names = "default", "gpio", "gpio_pu", "gpio_pd", "gpio_input", "spi", "pwm", "pruout", "pruin";
+				pinctrl-0 = <&P9_30_default_pin>;
+				pinctrl-1 = <&P9_30_gpio_pin>;
+				pinctrl-2 = <&P9_30_gpio_pu_pin>;
+				pinctrl-3 = <&P9_30_gpio_pd_pin>;
+				pinctrl-4 = <&P9_30_gpio_input_pin>;
+				pinctrl-5 = <&P9_30_spi_pin>;
+				pinctrl-6 = <&P9_30_pwm_pin>;
+				pinctrl-7 = <&P9_30_pruout_pin>;
+				pinctrl-8 = <&P9_30_pruin_pin>;
+			};
+
+			/* P9_31 (ZCZ ball A13) audio */
+			P9_31_pinmux {
+				compatible = "bone-pinmux-helper";
+				status = "okay";
+				pinctrl-names = "default", "gpio", "gpio_pu", "gpio_pd", "gpio_input", "spi_sclk", "pwm", "pruout", "pruin";
+				pinctrl-0 = <&P9_31_default_pin>;
+				pinctrl-1 = <&P9_31_gpio_pin>;
+				pinctrl-2 = <&P9_31_gpio_pu_pin>;
+				pinctrl-3 = <&P9_31_gpio_pd_pin>;
+				pinctrl-4 = <&P9_31_gpio_input_pin>;
+				pinctrl-5 = <&P9_31_spi_sclk_pin>;
+				pinctrl-6 = <&P9_31_pwm_pin>;
+				pinctrl-7 = <&P9_31_pruout_pin>;
+				pinctrl-8 = <&P9_31_pruin_pin>;
+			};
+
+			/* P9_42 (ZCZ ball C18) */
+			P9_42_pinmux {
+				compatible = "bone-pinmux-helper";
+				status = "okay";
+				pinctrl-names = "default", "gpio", "gpio_pu", "gpio_pd", "gpio_input", "spi_cs", "spi_sclk", "uart", "pwm", "pru_ecap";
+				pinctrl-0 = <&P9_42_default_pin>;
+				pinctrl-1 = <&P9_42_gpio_pin>;
+				pinctrl-2 = <&P9_42_gpio_pu_pin>;
+				pinctrl-3 = <&P9_42_gpio_pd_pin>;
+				pinctrl-4 = <&P9_42_gpio_input_pin>;
+				pinctrl-5 = <&P9_42_spi_cs_pin>;
+				pinctrl-6 = <&P9_42_spi_sclk_pin>;
+				pinctrl-7 = <&P9_42_uart_pin>;
+				pinctrl-8 = <&P9_42_pwm_pin>;
+				pinctrl-9 = <&P9_42_pru_ecap_pin>;
+			};
+
+			/* P9_42.1 */
+			/* P9_92 (ZCZ ball B12) */
+			P9_92_pinmux {
+				compatible = "bone-pinmux-helper";
+				status = "okay";
+				pinctrl-names = "default", "gpio", "gpio_pu", "gpio_pd", "gpio_input", "qep", "pruout", "pruin";
+				pinctrl-0 = <&P9_92_default_pin>;
+				pinctrl-1 = <&P9_92_gpio_pin>;
+				pinctrl-2 = <&P9_92_gpio_pu_pin>;
+				pinctrl-3 = <&P9_92_gpio_pd_pin>;
+				pinctrl-4 = <&P9_92_gpio_input_pin>;
+				pinctrl-5 = <&P9_92_qep_pin>;
+				pinctrl-6 = <&P9_92_pruout_pin>;
+				pinctrl-7 = <&P9_92_pruin_pin>;
+			};
+
+		};
+	};
+
+	fragment@3 {
+		target = <&ocp>;
+		__overlay__ {
+			cape-universal {
+				compatible = "gpio-of-helper";
+				status = "okay";
+				pinctrl-names = "default";
+				pinctrl-0 = <>;
+
+				P9_29 {
+					gpio-name = "P9_29";
+					gpio = <&gpio3 15 0>;
+					input;
+					dir-changeable;
+				};
+
+				/* occupy by WL18XX */
+				#if 0
+				P9_30 {
+					gpio-name = "P9_30";
+					gpio = <&gpio3 16 0>;
+					input;
+					dir-changeable;
+				};
+				#endif
+
+				P9_31 {
+					gpio-name = "P9_31";
+					gpio = <&gpio3 14 0>;
+					input;
+					dir-changeable;
+				};
+
+				P9_42 {
+					gpio-name = "P9_42";
+					gpio = <&gpio0 7 0>;
+					input;
+					dir-changeable;
+				};
+
+				P9_92 {
+					gpio-name = "P9_92";
+					gpio = <&gpio3 18 0>;
+					input;
+					dir-changeable;
+				};
+			};
+		};
+	};
+
+	fragment@4 {
+		target = <&spi1>;
+		__overlay__ {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			status = "okay";
+			pinctrl-names = "default";
+			pinctrl-0 = <>;
+			/* disable dma when used as an overlay,
+			 * dma gets stuck at 160 bits...
+			 */
+			ti,pio-mode;
+
+			channel@0 {
+				#address-cells = <1>;
+				#size-cells = <0>;
+
+				compatible = "spidev";
+
+				reg = <0>;
+				spi-max-frequency = <16000000>;
+				spi-cpha;
+			};
+
+			channel@1 {
+				#address-cells = <1>;
+				#size-cells = <0>;
+
+				compatible = "spidev";
+
+				reg = <1>;
+				spi-max-frequency = <16000000>;
+			};
+		};
+	};
+};
