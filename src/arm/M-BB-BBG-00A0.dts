@@ -8,6 +8,9 @@
 /dts-v1/;
 /plugin/;
 
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/pinctrl/am33xx.h>
+
 / {
 	fragment@0 {
 		target-path="/";
@@ -16,4 +19,26 @@
 			compatible = "ti,am335x-bone-green", "ti,am335x-bone-black", "ti,am335x-bone", "ti,am33xx";
 		};
 	};
+
+	fragment@1 {
+		target = <&am33xx_pinmux>;
+		__overlay__ {
+			usb0_drvvbus: usb0_drvvbus {
+				pinctrl-single,pins = <
+					AM33XX_IOPAD(0xA1C, PIN_OUTPUT_PULLDOWN | MUX_MODE0) /* usb0_drvvbus.usb0_drvvbus */
+				>;
+			};
+		};
+	};
+
+	fragment@2 {
+		target = <&usb0>;
+		__overlay__ {
+			pinctrl-names = "default";
+			pinctrl-0 = <&usb0_drvvbus>;
+			status = "okay";
+			dr_mode = "otg";
+		};
+	};
 };
+
