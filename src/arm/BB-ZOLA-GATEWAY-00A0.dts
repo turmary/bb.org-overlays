@@ -11,6 +11,7 @@
 /dts-v1/;
 /plugin/;
 
+#include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/board/am335x-bbw-bbb-base.h>
 #include <dt-bindings/pinctrl/am33xx.h>
 
@@ -52,6 +53,11 @@
 		__overlay__ {
 			P9_19_pinmux { status = "disabled"; };	/* P9_19: i2c2_scl.d_can0_rx */
 			P9_20_pinmux { status = "disabled"; };	/* P9_20: i2c2_sda.d_can0_tx */
+
+			/*
+			 * Free up the gpios used by the cape-universal gpio helpers.
+			 */
+			cape-universal { status = "disabled"; };
 		};
 	};
 
@@ -73,6 +79,18 @@
 			status = "okay";
 			pinctrl-names = "default";
 			pinctrl-0 = <&bb_dcan0_pins>;
+		};
+	};
+
+	fragment@10 {
+		target = <&gpio1>;
+		__overlay__ {
+			vdd_5v_b_en {
+				gpio-hog;
+				gpios = <17 GPIO_ACTIVE_HIGH>;
+				output-high;
+				line-name = "VDD_5V_B_EN";
+			};
 		};
 	};
 };
