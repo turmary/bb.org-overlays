@@ -126,3 +126,60 @@
 	>;
 };
 
+/* RS485_1(UART1) on J6 */
+&ocp {
+	P8_28_pinmux { status = "disabled"; };	/* P8_28: lcd_pclk.gpio2_24 */
+	P9_24_pinmux { status = "disabled"; };	/* P9_24: uart1_txd.uart1_txd */
+	P9_26_pinmux { status = "disabled"; };	/* P9_26: uart1_rxd.uart1_rxd */
+};
+&uart1 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&P8_28_gpio_pin &P9_24_uart_pin &P9_26_uart_pin>;
+	rts-gpio = <&gpio2 24 GPIO_ACTIVE_HIGH>;
+	rs485-rts-active-high;
+	/* rs485-rx-during-tx; */
+	rs485-rts-delay = <1 1>;
+	linux,rs485-enabled-at-boot-time;
+};
+
+/* UART3 */
+&ocp {
+	P9_42_pinmux { status = "disabled"; };	/* P9_42: eCAP0_in_PWM0_out.uart3_txd */
+};
+&am33xx_pinmux {
+	uart3_pins: uart3_pins {
+		pinctrl-single,pins = <
+			AM33XX_IOPAD(0x964, PIN_OUTPUT | MUX_MODE1) /* ecap0_in_pwm0_out.uart3_txd */
+			AM33XX_IOPAD(0x960, PIN_INPUT | MUX_MODE1)  /* spi0_cs1.uart3_rxd */
+		>;
+	};
+};
+&uart3 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart3_pins>;
+};
+
+/* RS485_2(UART4) on J4 */
+&ocp {
+	P8_29_pinmux { status = "disabled"; };	/* P8_29: lcd_hsync.gpio2_23 */
+	P9_13_pinmux { status = "disabled"; };	/* P9_13: gpmc_wpn.uart4_txd */
+	P9_11_pinmux { status = "disabled"; };	/* P9_11: gpmc_wait0.uart4_rxd */
+};
+&uart4 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&P8_29_gpio_pin &P9_13_uart_pin &P9_11_uart_pin>;
+	rts-gpio = <&gpio2 23 GPIO_ACTIVE_HIGH>;
+	rs485-rts-active-high;
+	/* rs485-rx-during-tx; */
+	rs485-rts-delay = <1 1>;
+	linux,rs485-enabled-at-boot-time;
+};
+
+/* UART5 not used */
+&uart5 {
+	status = "disabled";
+};
+
