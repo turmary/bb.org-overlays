@@ -184,12 +184,15 @@
 	status = "disabled";
 };
 
-/* 2x 12V Digital Inputs */
+/* 2x 12V Digital Inputs & INs/OUTs */
 &am33xx_pinmux {
 	digital_in_pins: digital_in_pins {
 		pinctrl-single,pins = <
 			AM33XX_IOPAD(0x0864, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE7)  /* gpmc_a9.gpio1_25 */
 			AM33XX_IOPAD(0x086c, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE7)  /* gpmc_a11.gpio1_27 */
+
+			/* Other INs & OUTs pinmux already defined by P{8,9}_XX_pinmux */
+			AM33XX_IOPAD(AM335X_PIN_USB0_DRVVBUS, PIN_INPUT_PULLDOWN | MUX_MODE7) /* usb0_drvvbus.gpio0_18 */
 		>;
 	};
 };
