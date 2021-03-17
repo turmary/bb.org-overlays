@@ -183,3 +183,21 @@
 	status = "disabled";
 };
 
+/* 2x 12V Digital Inputs */
+&am33xx_pinmux {
+	digital_in_pins: digital_in_pins {
+		pinctrl-single,pins = <
+			AM33XX_IOPAD(0x0864, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE7)  /* gpmc_a9.gpio1_25 */
+			AM33XX_IOPAD(0x086c, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE7)  /* gpmc_a11.gpio1_27 */
+		>;
+	};
+};
+&ocp {
+	digital_inputs {
+		compatible = "gpio-of-helper";
+		status = "okay";
+		pinctrl-names = "default";
+		pinctrl-0 = <&digital_in_pins>;
+	};
+};
+
