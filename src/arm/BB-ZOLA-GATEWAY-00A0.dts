@@ -276,3 +276,16 @@
 	status = "disabled";
 };
 
+/* USB0/LTE */
+&gpio1 {
+	vdd_lte_3v3_en {
+		gpio-hog;
+		gpios = <19 GPIO_ACTIVE_HIGH>;
+		output-high;
+		line-name = "VDD_LTE_3V3_EN";
+	};
+};
+&usb0 {
+	dr_mode = "host";
+};
+
