@@ -201,3 +201,16 @@
 	};
 };
 
+/* 5x User LEDs
+ * usr0 - usr3 same with BeagleBone
+ * usr4 pinmux defined by P9_15_pinmux
+ */
+&{/leds} {
+	usr4 {
+		label = "beaglebone:green:usr4";
+		gpios = <&gpio1 16 GPIO_ACTIVE_HIGH>;
+		linux,default-trigger = "none";
+		default-state = "off";
+	};
+};
+
