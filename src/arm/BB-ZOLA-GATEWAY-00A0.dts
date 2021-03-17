@@ -12,6 +12,7 @@
 /plugin/;
 
 #include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/interrupt-controller/irq.h>
 #include <dt-bindings/board/am335x-bbw-bbb-base.h>
 #include <dt-bindings/pinctrl/am33xx.h>
 
@@ -242,6 +243,33 @@
 	status = "disabled";
 };
 &ecap2 {
+	status = "disabled";
+};
+
+/* Ext RTC */
+&i2c0 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	rtc@68 {
+		compatible = "ds1340";
+		reg = <0x68>;
+		interrupt-parent = <&gpio3>;
+		interrupts = <21 IRQ_TYPE_EDGE_FALLING>; /* gpio3_21 */
+	};
+};
+
+/* I2C1/ATECC */
+&ocp {
+	P9_17_pinmux { status = "disabled"; };	/* spi0_cs0.i2c1_scl */
+	P9_18_pinmux { status = "disabled"; };	/* spi0_d1.i2c1_sda */
+};
+&i2c1 {
+	pinctrl-0 = <&P9_17_i2c_pin &P9_18_i2c_pin>;
+};
+
+/* I2C2 not used */
+&i2c2 {
 	status = "disabled";
 };
 
