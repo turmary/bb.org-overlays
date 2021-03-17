@@ -214,3 +214,34 @@
 	};
 };
 
+/* PWM1/BUZZER */
+&ocp {
+	P9_14_pinmux { status = "disabled"; };	/* P9_14: gpmc_a2.ehrpwm1a */
+};
+&epwmss0 {
+	status = "disabled";
+};
+&epwmss2 {
+	status = "disabled";
+};
+&ehrpwm0 {
+	status = "disabled";
+};
+&ehrpwm1 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&P9_14_pwm_pin>;
+};
+&ehrpwm2 {
+	status = "disabled";
+};
+&ecap0 {
+	status = "disabled";
+};
+&ecap1 {
+	status = "disabled";
+};
+&ecap2 {
+	status = "disabled";
+};
+
