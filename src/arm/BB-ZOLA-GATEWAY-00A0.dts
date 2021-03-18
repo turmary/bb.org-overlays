@@ -289,3 +289,14 @@
 	dr_mode = "host";
 };
 
+/* EQEP not used */
+&eqep0 {
+	status = "disabled";
+};
+&eqep1 {
+	status = "disabled";
+};
+&eqep2 {
+	status = "disabled";
+};
+
